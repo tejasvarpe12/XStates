@@ -8,7 +8,7 @@ function App() {
   const [selectedCountry, setSelectedCountry] = useState('');
   const [selectedState, setSelectedState] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
-  const [error, setError] = useState(null); 
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchCountries();
@@ -40,15 +40,29 @@ function App() {
   };
 
   const fetchStates = async () => {
-    const response = await fetch(`https://crio-location-selector.onrender.com/country=${selectedCountry}/states`);
-    const data = await response.json();
-    setStates(data);
+    try {
+      const response = await fetch(`https://crio-location-selector.onrender.com/country=${selectedCountry}/states`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch states');
+      }
+      const data = await response.json();
+      setStates(data);
+    } catch (error) {
+      setError(error.message);
+    }
   };
 
   const fetchCities = async () => {
-    const response = await fetch(`https://crio-location-selector.onrender.com/country=${selectedCountry}/state=${selectedState}/cities`);
-    const data = await response.json();
-    setCities(data);
+    try {
+      const response = await fetch(`https://crio-location-selector.onrender.com/country=${selectedCountry}/state=${selectedState}/cities`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch cities');
+      }
+      const data = await response.json();
+      setCities(data);
+    } catch (error) {
+      setError(error.message);
+    }
   };
 
   const handleCountryChange = (e) => {
@@ -76,29 +90,24 @@ function App() {
       <div className="container">
         <h1>Select Location</h1>
         {error && <p className="error-message">Error: {error}</p>}
-        
-          <select className='country' value={selectedCountry} onChange={handleCountryChange}>
-            <option value="" disabled>Select Country</option>
-            {countries.map(country => (
-              <option key={country} value={country}>{country}</option>
-            ))}
-          </select>
-        
-        
-          <select className='state' value={selectedState} onChange={handleStateChange} disabled={!selectedCountry}>
-            <option value="" disabled>Select State</option>
-            {states.map(state => (
-              <option key={state} value={state}>{state}</option>
-            ))}
-          </select>
-       
-          <select className='city' value={selectedCity} onChange={handleCityChange} disabled={!selectedState}>
-            <option value="" disabled>Select City</option>
-            {cities.map(city => (
-              <option key={city} value={city}>{city}</option>
-            ))}
-          </select>
-        
+        <select className='country' value={selectedCountry} onChange={handleCountryChange}>
+          <option value="" disabled>Select Country</option>
+          {countries.map(country => (
+            <option key={country} value={country}>{country}</option>
+          ))}
+        </select>
+        <select className='state' value={selectedState} onChange={handleStateChange} disabled={!selectedCountry}>
+          <option value="" disabled>Select State</option>
+          {states.map(state => (
+            <option key={state} value={state}>{state}</option>
+          ))}
+        </select>
+        <select className='city' value={selectedCity} onChange={handleCityChange} disabled={!selectedState}>
+          <option value="" disabled>Select City</option>
+          {cities.map(city => (
+            <option key={city} value={city}>{city}</option>
+          ))}
+        </select>
         {isAllSelected && <p>You selected {selectedCity}, {selectedState}, {selectedCountry}</p>}
       </div>
     </div>
